@@ -4,27 +4,29 @@ import { useState } from 'react';
 
 interface TankProps {
     maxVolume: number;
-    initialVolume?: number;
+    initialIntake?: number;
+    initialOutput?: number;
     color?: string;
 }
 
-export function Tank({ maxVolume = 5000, initialVolume = 0, color = '#228be6' }: TankProps) {
-    const [intakeVolume, setIntakeVolume] = useState(initialVolume);
-    const [outputVolume, setOutputVolume] = useState(initialVolume);
-    const [input, setInput] = useState<number | ''>('');
+export function Tank({ maxVolume = 5000, initialIntake: initialIntake = 0, initialOutput: initialOutput = 0, color = '#228be6' }: TankProps) {
+    const [intakeVolume, setIntakeVolume] = useState(initialIntake);
+    const [outputVolume, setOutputVolume] = useState(initialOutput);
+    const [newIntake, setNewIntake] = useState<number | ''>('');
+    const [newOutput, setNewOutput] = useState<number | ''>('');
 
   const handleIntake = () => {
-    if (typeof input === 'number') {
-        setIntakeVolume((prev) => Math.min(prev + input, maxVolume));
-        setInput('');
+    if (typeof newIntake === 'number') {
+        setIntakeVolume((prev) => Math.min(prev + newIntake, maxVolume));
+        setNewIntake('');
     }
   };
 
   const handleOutput = () => {
-    if (typeof input === 'number') {
-        setIntakeVolume((prev) => Math.min(prev - input, maxVolume));
-        setOutputVolume((prev) => Math.min(prev + input, maxVolume));
-        setInput('');
+    if (typeof newOutput === 'number') {
+        setIntakeVolume((prev) => Math.min(prev - newOutput, maxVolume));
+        setOutputVolume((prev) => Math.min(prev + newOutput, maxVolume));
+        setNewOutput('');
     }
   };
 
@@ -34,44 +36,57 @@ export function Tank({ maxVolume = 5000, initialVolume = 0, color = '#228be6' }:
   return (
     <>
       <Flex className={styles.horizontalFlex}>
-        <Box className={styles.container}>
-          <Text>Intake</Text>
-          <div className={styles.tank}>
-          <div className={styles.fill} style={{ height: `${intakeHeight}%`, backgroundColor: color }} />
-          </div>
-          <Text size="xs">{intakeVolume} mL ({intakeHeight.toFixed(0)}%)</Text>
-        </Box>
+        <Flex className={styles.verticalFlex}>
+          <NumberInput
+            className={styles.inputBox}
+            value={newIntake}
+            onChange={(value) => {
+                if (typeof value === 'number' || value === '') { setNewIntake(value);}
+            }}
+            placeholder="Add mL"
+            min={0}
+            max={maxVolume}
+            step={50}
+            hideControls
+            size="sm"
+          />
+          <Button className={styles.button} onClick={handleIntake}>
+            Update
+          </Button>
 
-        <Box className={styles.container}>
-          <Text>Output</Text>
-          <div className={styles.tank}>
-          <div className={styles.fill} style={{ height: `${outputHeight}%`, backgroundColor: color }} />
-          </div>
-          <Text size="xs">{outputVolume} mL ({outputHeight.toFixed(0)}%)</Text>
-        </Box>
-      </Flex>
-
-      <NumberInput
-        value={input}
-        onChange={(value) => {
-            if (typeof value === 'number' || value === '') { setInput(value);}
-        }}
-        placeholder="Add mL"
-        min={0}
-        max={maxVolume}
-        step={50}
-        hideControls
-        size="xs"
-        width={100}
-      />
-
-      <Flex className={styles.horizontalFlex}>
-        <Button className={styles.button} onClick={handleIntake}>
-        Intake
-        </Button>
-        <Button className={styles.button} onClick={handleOutput}>
-        Output
-        </Button>
+          <Box className={styles.container}>
+            <Text>Intake</Text>
+            <div className={styles.tank}>
+            <div className={styles.fill} style={{ height: `${intakeHeight}%`, backgroundColor: color }} />
+            </div>
+            <Text size="xs">{intakeVolume} mL ({intakeHeight.toFixed(0)}%)</Text>
+          </Box>
+        </Flex>
+        <Flex className={styles.verticalFlex}>
+          <NumberInput
+              className={styles.inputBox}
+              value={newOutput}
+              onChange={(value) => {
+                  if (typeof value === 'number' || value === '') { setNewOutput(value);}
+              }}
+              placeholder="Add mL"
+              min={0}
+              max={maxVolume}
+              step={50}
+              hideControls
+              size="sm"
+          />
+          <Button className={styles.button} onClick={handleOutput}>
+            Update
+          </Button>
+          <Box className={styles.container}>
+            <Text>Output</Text>
+              <div className={styles.tank}>
+              <div className={styles.fill} style={{ height: `${outputHeight}%`, backgroundColor: color }} />
+              </div>
+            <Text size="xs">{outputVolume} mL ({outputHeight.toFixed(0)}%)</Text>
+          </Box>
+        </Flex>
       </Flex>
     </>
   );
