@@ -1,4 +1,4 @@
-import { Text, Stack, NumberInput, Button, Flex, Box, Select } from '@mantine/core';
+import { Text, NumberInput, Button, Flex, Box, Select, Tooltip } from '@mantine/core';
 import styles from '../styles/Tanks.module.css';
 import { useState } from 'react';
 
@@ -10,6 +10,29 @@ interface TankProps {
 
 type FluidTotals = Record<string, number>; 
 
+const fluidColors: Record<string, string> = {
+  generic: '#333533',       // Jet
+  oral: '#00b4d8',          // Pacific cyan
+  parenteral: '#90e0ef',    // Non Photo blue
+  enteral: '#FFC2D1',       // Pink
+  irrigation: '#D3D3D3',    // Timberwolf
+  dialysis: '#99D98C',      // Light green
+  voided: '#FFEA00',        // Canary
+  foley: '#FAE588',         // Jasmine
+  suprapubic: '#FFD000',    // Jonquil
+  nephrostomy: '#FFC2D1',   // Pink
+  stool: '#6F4518',         // Sepia
+  ostomy: '#b19881',        // Lion
+  ng: '#0077B6',            // Honolulu Blue
+  emesis: '#BFD200',        // Pear
+  peg: '#D3D3D3',           // Timberwolf
+  woundDrains: '#C1121F',   // Fire brick
+  chestTube: '#BC3908',     // Rust
+  blood: '#780000',         // Barn red
+  sweat: '#90e0ef',         // Non Photo blue
+};
+
+
 export function Tank({ maxVolume = 5000, initialIntake: initialIntake = 0, initialOutput: initialOutput = 0}: TankProps) {
     const [intakeVolume, setIntakeVolume] = useState(initialIntake);
     const [outputVolume, setOutputVolume] = useState(initialOutput);
@@ -17,8 +40,8 @@ export function Tank({ maxVolume = 5000, initialIntake: initialIntake = 0, initi
     const [newOutput, setNewOutput] = useState<number | ''>('');
     const [intakeType, setIntakeType] = useState<string | null>(null);
     const [outputType, setOutputType] = useState<string | null>(null);
-    const [fluidColor, setFluidColor] = useState<string | ''>('');
     const [intakeFluids, setIntakeFluids] = useState<FluidTotals>({
+      generic: 0,
       oral: 0,
       parental: 0,
       enteral: 0,
@@ -26,6 +49,7 @@ export function Tank({ maxVolume = 5000, initialIntake: initialIntake = 0, initi
       dialysis: 0
     });
     const [outputFluids, setOutputFluids] = useState<FluidTotals>({
+      generic: 0,
       foley: 0,
       suprapubic: 0,
       nephrostomy: 0,
@@ -46,7 +70,7 @@ export function Tank({ maxVolume = 5000, initialIntake: initialIntake = 0, initi
         // Update state (prev =>)
         // Copies all existing fluid entries (..prev)
         // Take previous value for the selected type, or 0 if not there yet, and add newIntake
-        setOutputFluids(prev => ({...prev, [intakeType]: (prev[intakeType] || 0) + newIntake}));
+        setIntakeFluids(prev => ({...prev, [intakeType]: (prev[intakeType] || 0) + newIntake}));
     
         // Update overall output volume
         setIntakeVolume(prev => Math.min(prev + newIntake, maxVolume));
@@ -76,11 +100,13 @@ export function Tank({ maxVolume = 5000, initialIntake: initialIntake = 0, initi
   return (
     <>
       <Flex className={styles.horizontalFlex}>
+        {/* Intake Section */}
         <Flex className={styles.verticalFlex}>
           <Select
             className={styles.selectBox}
             placeholder="Intake Type"
             data={[
+              { value: 'generic', label: 'Generic' },
               { value: 'oral', label: 'Oral Intake' },
               { value: 'parenteral', label: 'Parenteral Intake' },
               { value: 'enteral', label: 'Enteral Intake' },
@@ -103,24 +129,41 @@ export function Tank({ maxVolume = 5000, initialIntake: initialIntake = 0, initi
                 step={50}
                 hideControls
                 size="sm"
-                />
-              <Button className={styles.button} onClick={handleIntake}>
-                Update
-              </Button>
-            </Flex>
+            />
+            <Button className={styles.button} onClick={handleIntake}>
+              Update
+            </Button>
+          </Flex>
           <Box className={styles.container}>
-            <Text>Intake</Text>
-            <div className={styles.tank}>
-            <div className={styles.fill} style={{ height: `${intakeHeight}%`, backgroundColor: fluidColor }} />
-            </div>
-            <Text size="xs">{intakeVolume} mL ({intakeHeight.toFixed(0)}%)</Text>
-          </Box>
+          <Text>Intake</Text>
+          <div className={styles.tank}>
+            {Object.entries(intakeFluids).map(([type, volume]) => {
+              if (volume === 0) { return null };
+
+              const height = (volume / maxVolume) * 100;
+              const color = fluidColors[type] || '#333533';
+
+              return (
+                <Tooltip label={`${type}: ${volume} mL`} position="right" withArrow transitionProps={{ duration: 150 }}>
+                <div
+                  key={type}
+                  className={styles.fill}
+                  style={{ height: `${height}%`, backgroundColor: color }}
+                />
+                </Tooltip>
+              );
+            })}
+          </div>
+          <Text size="xs">{intakeVolume} mL ({intakeHeight.toFixed(0)}%)</Text>
+        </Box>
         </Flex>
+        {/* Output Section */}
         <Flex className={styles.verticalFlex}>
           <Select
               className={styles.selectBox}
               placeholder="Output Type"
               data={[
+                { value: 'generic', label: 'Generic' },
                 { value: 'voided', label: 'Urinary: voided' },
                 { value: 'foley', label: 'Urinary: foley' },
                 { value: 'suprapubic', label: 'Urinary: suprapubic' },
@@ -130,8 +173,8 @@ export function Tank({ maxVolume = 5000, initialIntake: initialIntake = 0, initi
                 { value: 'ng', label: 'GI: NG tube' },
                 { value: 'emesis', label: 'GI: emesis' },
                 { value: 'peg', label: 'GI: PEG' },
-                { value: 'wound-drains', label: 'Other: wound/surgical drains' },
-                { value: 'chest-tube', label: 'Other: chest tube' },
+                { value: 'woundDrains', label: 'Other: wound/surgical drains' },
+                { value: 'chestTube', label: 'Other: chest tube' },
                 { value: 'irrigation', label: 'Other: irrigation' },
                 { value: 'blood', label: 'Other: blood' },
                 { value: 'sweat', label: 'Other: sweat' },
@@ -158,12 +201,27 @@ export function Tank({ maxVolume = 5000, initialIntake: initialIntake = 0, initi
             </Button>
           </Flex>
           <Box className={styles.container}>
-            <Text>Output</Text>
-              <div className={styles.tank}>
-              <div className={styles.fill} style={{ height: `${outputHeight}%`, backgroundColor: fluidColor }} />
-              </div>
-            <Text size="xs">{outputVolume} mL ({outputHeight.toFixed(0)}%)</Text>
-          </Box>
+          <Text>Output</Text>
+          <div className={styles.tank}>
+            {Object.entries(outputFluids).map(([type, volume]) => {
+              if (volume === 0) { return null };
+
+              const height = (volume / maxVolume) * 100;
+              const color = fluidColors[type] || '#333533';
+
+              return (
+                <Tooltip label={`${type}: ${volume} mL`} position="right" withArrow transitionProps={{ duration: 150 }}>
+                <div
+                  key={type}
+                  className={styles.fill}
+                  style={{ height: `${height}%`, backgroundColor: color }}
+                />
+                </Tooltip>
+              );
+            })}
+          </div>
+          <Text size="xs">{outputVolume} mL ({outputHeight.toFixed(0)}%)</Text>
+        </Box>
         </Flex>
       </Flex>
     </>

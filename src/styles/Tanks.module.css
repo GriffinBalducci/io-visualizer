@@ -4,18 +4,16 @@
     border: 3px solid black;
     border-radius: 10px;
     background-color: white;
-    position: relative;
     overflow: hidden;
+    display: flex;
+    flex-direction: column-reverse;
 }
   
 .fill {
-    position: absolute;
-    bottom: 0;
     width: 100%;
-    background-color: lightblue;
-    transition: height 0.4s ease;
+    transition: height 0.3s ease;
 }
-
+  
 .horizontalFlex {
     flex-direction: row;
     align-items: center;
@@ -44,7 +42,7 @@
 }
 
 .button {
-    height: 30px !important;
+    height: 36px !important;
     width: 75px !important;
     padding: 0 !important;
     margin: 0 !important;
