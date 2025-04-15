@@ -9,8 +9,7 @@
 }
 
 .displayCard {
-    height: 60vh;
-    width: 60vh;
+    max-width: 90%;
     background-color: antiquewhite;
     display: flex;
     gap: 1rem;

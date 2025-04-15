@@ -1,4 +1,4 @@
-import { Text, NumberInput, Button, Flex, Box, Select, Tooltip } from '@mantine/core';
+import { Text, NumberInput, Button, Flex, Box, Select, Tooltip, NumberInputStylesNames, Slider } from '@mantine/core';
 import styles from '../styles/Tanks.module.css';
 import { useState } from 'react';
 
@@ -6,6 +6,12 @@ interface TankProps {
     maxVolume: number;
     initialIntake?: number;
     initialOutput?: number;
+}
+
+export interface FluidEntry {
+  type: string;
+  volume: number;
+  timestamp: number;
 }
 
 type FluidTotals = Record<string, number>; 
@@ -34,68 +40,68 @@ const fluidColors: Record<string, string> = {
 
 
 export function Tank({ maxVolume = 5000, initialIntake: initialIntake = 0, initialOutput: initialOutput = 0}: TankProps) {
-    const [intakeVolume, setIntakeVolume] = useState(initialIntake);
-    const [outputVolume, setOutputVolume] = useState(initialOutput);
-    const [newIntake, setNewIntake] = useState<number | ''>('');
-    const [newOutput, setNewOutput] = useState<number | ''>('');
-    const [intakeType, setIntakeType] = useState<string | null>(null);
-    const [outputType, setOutputType] = useState<string | null>(null);
-    const [intakeFluids, setIntakeFluids] = useState<FluidTotals>({
-      generic: 0,
-      oral: 0,
-      parental: 0,
-      enteral: 0,
-      irrigation: 0,
-      dialysis: 0
-    });
-    const [outputFluids, setOutputFluids] = useState<FluidTotals>({
-      generic: 0,
-      foley: 0,
-      suprapubic: 0,
-      nephrostomy: 0,
-      stool: 0,
-      ostomy: 0,
-      ng: 0,
-      emesis: 0,
-      peg: 0,
-      woundDrains: 0,
-      chestTube: 0,
-      irrigation: 0,
-      blood: 0,
-      sweat: 0
-    });
-    const handleIntake = () => {
-      // Ensure number was actually input and an actual intake was selected
-      if (typeof newIntake === 'number' && intakeType) {
-        // Update state (prev =>)
-        // Copies all existing fluid entries (..prev)
-        // Take previous value for the selected type, or 0 if not there yet, and add newIntake
-        setIntakeFluids(prev => ({...prev, [intakeType]: (prev[intakeType] || 0) + newIntake}));
-    
-        // Update overall output volume
-        setIntakeVolume(prev => Math.min(prev + newIntake, maxVolume));
-    
-        // Reset input
-        setNewIntake('');
-      }
-    };
-    const handleOutput = () => {
-      // Ensure number was actually input and an actual output was selected
-      if (typeof newOutput === 'number' && outputType) {
-        // Update state (prev =>)
-        // Copies all existing fluid entries (..prev)
-        // Take previous value for the selected type, or 0 if not there yet, and add newOutput
-        setOutputFluids(prev => ({...prev, [outputType]: (prev[outputType] || 0) + newOutput}));
+  const [timeframe, setTimeframe] = useState<string>("all");
+  const [intakeEntries, setIntakeEntries] = useState<FluidEntry[]>([]);
+  const [outputEntries, setOutputEntries] = useState<FluidEntry[]>([]);
+  const [intakeVolume, setIntakeVolume] = useState(initialIntake);
+  const [outputVolume, setOutputVolume] = useState(initialOutput);
+  const [newIntake, setNewIntake] = useState<number | ''>('');
+  const [newOutput, setNewOutput] = useState<number | ''>('');
+  const [intakeType, setIntakeType] = useState<string | null>(null);
+  const [outputType, setOutputType] = useState<string | null>(null);
+  const [intakeFluids, setIntakeFluids] = useState<FluidTotals>({
+    generic: 0,
+    oral: 0,
+    parental: 0,
+    enteral: 0,
+    irrigation: 0,
+    dialysis: 0
+  });
+  const [outputFluids, setOutputFluids] = useState<FluidTotals>({
+    generic: 0,
+    foley: 0,
+    suprapubic: 0,
+    nephrostomy: 0,
+    stool: 0,
+    ostomy: 0,
+    ng: 0,
+    emesis: 0,
+    peg: 0,
+    woundDrains: 0,
+    chestTube: 0,
+    irrigation: 0,
+    blood: 0,
+    sweat: 0
+  });
+  const handleIntake = () => {
+    if (typeof newIntake === 'number' && intakeType) {
+      const newEntry: FluidEntry = {
+        type: intakeType,
+        volume: newIntake,
+        timestamp: Date.now(),
+      };
+  
+      setIntakeEntries((prev) => [...prev, newEntry]);
+  
+      setNewIntake('');
+    }
+  };
+  const handleOutput = () => {
+    if (typeof newOutput === 'number' && outputType) {
+      const newEntry: FluidEntry = {
+        type: outputType,
+        volume: newOutput,
+        timestamp: Date.now(),
+      };
+  
+      setOutputEntries((prev) => [...prev, newEntry]);
+  
+      setNewOutput('');
+    }
+  };
 
-        // Update overall output volume
-        setOutputVolume(prev => Math.min(prev + newOutput, maxVolume));
-
-        // Reset input
-        setNewOutput('');
-      }
-    };
-    const intakeHeight = Math.min(Math.max((intakeVolume / maxVolume) * 100, 0), 100);
-    const outputHeight = Math.min(Math.max((outputVolume / maxVolume) * 100, 0), 100);
+  const intakeHeight = Math.min(Math.max((intakeVolume / maxVolume) * 100, 0), 100);
+  const outputHeight = Math.min(Math.max((outputVolume / maxVolume) * 100, 0), 100);
 
   return (
     <>
@@ -224,6 +230,20 @@ export function Tank({ maxVolume = 5000, initialIntake: initialIntake = 0, initi
         </Box>
         </Flex>
       </Flex>
+
+      <Select
+        label="Timeframe"
+        value={timeframe.toString()}
+        data={[
+          { value: 'all', label: 'All' },
+          { value: '1440', label: '24hr' },
+          { value: '720', label: '12hr' },
+          { value: '240', label: '4hr' },
+          { value: '60', label: '1hr' },
+          { value: '10', label: '10m' },
+        ]}
+        onChange={(value) => setTimeframe(value ?? 'all')}
+      />
     </>
   );
 }
