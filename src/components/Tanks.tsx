@@ -1,4 +1,5 @@
-import { Text, NumberInput, Button, Flex, Box, Select, Tooltip, NumberInputStylesNames, Slider } from '@mantine/core';
+import { Text, NumberInput, Button, Flex, Box, Select, Tooltip } from '@mantine/core';
+import { DateTimePicker } from '@mantine/dates';
 import styles from '../styles/Tanks.module.css';
 import { useState } from 'react';
 
@@ -11,7 +12,7 @@ interface TankProps {
 export interface FluidEntry {
   type: string;
   volume: number;
-  timestamp: number;
+  timestamp: Date;
 }
 
 type FluidTotals = Record<string, number>; 
@@ -40,6 +41,7 @@ const fluidColors: Record<string, string> = {
 
 
 export function Tank({ maxVolume = 5000, initialIntake: initialIntake = 0, initialOutput: initialOutput = 0}: TankProps) {
+  const [dateTime, setDateTime] = useState<Date>(new Date(Date.now()));
   const [timeframe, setTimeframe] = useState<string>("all");
   const [intakeEntries, setIntakeEntries] = useState<FluidEntry[]>([]);
   const [outputEntries, setOutputEntries] = useState<FluidEntry[]>([]);
@@ -78,7 +80,7 @@ export function Tank({ maxVolume = 5000, initialIntake: initialIntake = 0, initi
       const newEntry: FluidEntry = {
         type: intakeType,
         volume: newIntake,
-        timestamp: Date.now(),
+        timestamp: dateTime,
       };
   
       setIntakeEntries((prev) => [...prev, newEntry]);
@@ -91,7 +93,7 @@ export function Tank({ maxVolume = 5000, initialIntake: initialIntake = 0, initi
       const newEntry: FluidEntry = {
         type: outputType,
         volume: newOutput,
-        timestamp: Date.now(),
+        timestamp: dateTime,
       };
   
       setOutputEntries((prev) => [...prev, newEntry]);
@@ -122,19 +124,25 @@ export function Tank({ maxVolume = 5000, initialIntake: initialIntake = 0, initi
             value={intakeType}
             onChange={setIntakeType}
           />
-            <Flex className={styles.horizontalFlex}>
-                <NumberInput
-                className={styles.inputBox}
-                value={newIntake}
-                onChange={(value) => {
-                    if (typeof value === 'number' || value === '') { setNewIntake(value);}
-                }}
-                placeholder="Add mL"
-                min={0}
-                max={maxVolume}
-                step={50}
-                hideControls
-                size="sm"
+          <DateTimePicker className={styles.dateTime}
+            placeholder="Date/Time"
+            value={new Date()}
+            valueFormat='MM/DD/YYYY HH:mm'
+            onChange={setDateTime}
+          />
+          <Flex className={styles.horizontalFlex}>
+            <NumberInput
+            className={styles.inputBox}
+            value={newIntake}
+            onChange={(value) => {
+                if (typeof value === 'number' || value === '') { setNewIntake(value);}
+            }}
+            placeholder="Add mL"
+            min={0}
+            max={maxVolume}
+            step={50}
+            hideControls
+            size="sm"
             />
             <Button className={styles.button} onClick={handleIntake}>
               Update
@@ -187,6 +195,12 @@ export function Tank({ maxVolume = 5000, initialIntake: initialIntake = 0, initi
               ]}
               value={outputType}
               onChange={setOutputType}
+          />
+          <DateTimePicker className={styles.dateTime}
+            placeholder="Date/Time"
+            value={new Date()}
+            valueFormat='MM/DD/YYYY HH:mm'
+            onChange={setDateTime}
           />
           <Flex className={styles.horizontalFlex}>
             <NumberInput
