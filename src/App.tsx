@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { Text, Box, Card } from '@mantine/core';
+import { Text, Box, Card, SegmentedControl } from '@mantine/core';
 import styles from "./styles/App.module.css"
 import { Tank } from './components/Tanks';
 
 function App() {
-  const [timeframe, setTimeframe] = useState('60'); // 1hr default
+  const [viewMode, setViewMode] = useState<'tank' | 'scale'>('tank');
   
   return (
     <Box className={styles.fullPage}>
@@ -12,7 +12,15 @@ function App() {
         <Text className={styles.title}>
           The I/O Visualizer
         </Text>
-        <Tank maxVolume={5000}/>
+        <SegmentedControl
+          value={viewMode}
+          onChange={(val) => setViewMode(val as 'tank' | 'scale')}
+          data={[
+            { label: 'Tank View', value: 'tank' },
+            { label: 'Scale View', value: 'scale' },
+          ]}
+        />
+        <Tank maxVolume={5000} viewMode={viewMode}/>
         {/* Header */}
         {/* Timeframe Toggle */}
         {/* Intake + Output Tanks */}

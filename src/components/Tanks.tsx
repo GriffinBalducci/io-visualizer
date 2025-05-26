@@ -8,6 +8,7 @@ interface TankProps {
     maxVolume: number;
     initialIntake?: number;
     initialOutput?: number;
+    viewMode: 'tank' | 'scale';
 }
 
 export interface FluidEntry {
@@ -41,7 +42,7 @@ const fluidColors: Record<string, string> = {
 };
 
 
-export function Tank({ maxVolume = 5000, initialIntake: initialIntake = 0, initialOutput: initialOutput = 0}: TankProps) {
+export function Tank({ maxVolume = 5000, initialIntake: initialIntake = 0, initialOutput: initialOutput = 0, viewMode }: TankProps) {
   const [dateTime, setDateTime] = useState<Date>(new Date(Date.now()));
   const [timeframe, setTimeframe] = useState<string>("all");
   const [intakeEntries, setIntakeEntries] = useState<FluidEntry[]>([]);
@@ -166,6 +167,7 @@ export function Tank({ maxVolume = 5000, initialIntake: initialIntake = 0, initi
 
   return (
     <>
+      {viewMode === 'tank' ? (
       <Flex className={styles.horizontalFlex}>
         {/* Intake Section */}
         <Flex className={styles.verticalFlex}>
@@ -305,7 +307,28 @@ export function Tank({ maxVolume = 5000, initialIntake: initialIntake = 0, initi
         </Box>
         </Flex>
       </Flex>
+      ) : (
+        <Box className={styles.seesawWrapper}>
+          <Box className={styles.seesawContainer}>
+            <Box className={styles.pivot} />
+            <Box
+              className={styles.seesawBar}
+              style={{
+                transform: `rotate(${(outputVolume - intakeVolume) / maxVolume * 10}deg)`,
+              }}
+            >
+              <Box className={styles.scaleSide}>
+                <Text ta="center">🥤<br />Intake<br />{intakeVolume} mL</Text>
+              </Box>
+              <Box className={styles.scaleSide}>
+                <Text ta="center">🚽<br />Output<br />{outputVolume} mL</Text>
+              </Box>
+            </Box>
+          </Box>
+        </Box>
+      )}
 
+      {/* Timeframe Selector */}
       <Select
         label="Timeframe"
         value={timeframe.toString()}
