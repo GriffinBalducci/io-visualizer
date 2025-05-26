@@ -47,8 +47,6 @@ export function Tank({ maxVolume = 5000, initialIntake: initialIntake = 0, initi
   const [timeframe, setTimeframe] = useState<string>("all");
   const [intakeEntries, setIntakeEntries] = useState<FluidEntry[]>([]);
   const [outputEntries, setOutputEntries] = useState<FluidEntry[]>([]);
-  const [viewableIntakeEntries, setViewableIntakeEntries] = useState<FluidEntry[]>([]);
-  const [viewableOutputEntries, setViewableOutputEntries] = useState<FluidEntry[]>([]);
   const [intakeVolume, setIntakeVolume] = useState(initialIntake);
   const [outputVolume, setOutputVolume] = useState(initialOutput);
   const [newIntake, setNewIntake] = useState<number | ''>('');
@@ -85,10 +83,6 @@ export function Tank({ maxVolume = 5000, initialIntake: initialIntake = 0, initi
     // Filter entries based on the selected timeframe
     const filteredIntake = filterByTimeframe(intakeArray, timeframeValue);
     const filteredOutput = filterByTimeframe(outputArray, timeframeValue);
-
-    // Update state to display
-    setViewableIntakeEntries(filteredIntake);
-    setViewableOutputEntries(filteredOutput);
 
     // Group and sum intake by type
     const intakeGrouped: FluidTotals = {};
