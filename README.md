@@ -1,56 +1,75 @@
-# ONLINE DEPLOYMENT HERE: https://io-visualizer.vercel.app/
+# 🧪 The I/O Visualizer
 
-# React + TypeScript + Vite
+The **I/O Visualizer** is a fluid balance tracking tool that helps you visualize fluid intake and output data using interactive graphics. This project provides a clear, real-time representation of a patient's fluid status using a tank view and a seesaw-style scale view.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 🚀 Live Demo
 
-Currently, two official plugins are available:
+https://io-visualizer.vercel.app/
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🛠 Features
 
-## Expanding the ESLint configuration
+- 💧 **Tank View**: Graphically displays intake and output fluid levels by type with color-coded segments.
+- ⚖️ **Scale View**: A simple seesaw scale that tilts based on net fluid gain or loss.
+- 🕒 **Timeframe Filter**: View data from the last 10 minutes, 1 hour, 4 hours, 12 hours, 24 hours, or all time.
+- ⏰ **Date & Time Input**: Backdate entries using the datetime picker.
+- ✅ **Type Selection**: Categorize fluids (oral, parenteral, output types like emesis, stool, etc.)
+- 📊 **Volume Controls**: Easily add fluid volumes using a clean UI.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 📦 Technologies Used
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+- React + TypeScript
+- [Mantine](https://mantine.dev/) for UI components
+- CSS Modules for styling
+
+## 📂 Folder Structure
+
+```
+/src
+  /components
+    Tanks.tsx
+    Utils.tsx
+  /styles
+    App.module.css
+    Tanks.module.css
+  App.tsx
+  main.tsx
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🧑‍💻 Getting Started
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Prerequisites
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+- Node.js (v16+ recommended)
+- npm or yarn
+
+### Installation
+
+```bash
+git clone https://github.com/yourusername/io-visualizer.git
+cd io-visualizer
+npm install
 ```
+
+### Running the App
+
+```bash
+npm run dev
+```
+
+Open your browser and go to `http://localhost:5173`
+
+## 📝 Future Features
+
+- Save data between sessions (localStorage or backend)
+- Export to PDF or CSV
+- Color and Size Customization
+- Chart-based trend view
+
+## 🤝 Contributing
+
+Pull requests welcome! Feel free to fork the repo and submit improvements or ideas.
+
+## 📄 License
+
+MIT License.
+
